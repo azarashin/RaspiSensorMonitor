@@ -29,6 +29,9 @@ class Monitor:
     attribs={d.get_sensor_name(): d.get_sensor_attributes() for d in self._sensors}
     return json.dumps(attribs)
 
+  def get_device_list(self):
+    devices=[d.get_sensor_name() for d in self._sensors]
+    return json.dumps({'device_list': devices})
 
   def get_log(self, timestamp):
     logs={d.get_sensor_name(): 
@@ -39,4 +42,4 @@ class Monitor:
     return json.dumps(data)
 
   def get_current_timestamp(self):
-    return {'current_timestamp': time.time()}
+    return json.dumps({'current_timestamp': time.time()})

@@ -47,6 +47,10 @@ def attributes():
 def current_timestamp():
     return monitor.get_current_timestamp()
 
+@app.route('/device_list')
+def device_list():
+    return monitor.get_device_list()
+
 
 def start_monitor():
     monitor.start()
