@@ -55,8 +55,8 @@ class Graph:
 
         # 0.001秒停止
         plt.pause(0.001)
-        for plot in plots:
-            plot.remove()
+#        for plot in plots:
+#            plot.remove()
     
 class Viewer:
     def __init__(self, buffer_duration = 15.0, view_duration = 5.0, delay = 1.0):
