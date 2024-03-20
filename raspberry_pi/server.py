@@ -6,6 +6,7 @@ from flask import Flask, request
 from monitor import Monitor
 
 from ADXL345 import ADXL345
+from sincos import SinCos
 
 #ip=input('ip address:')
 #port=input('port:')
@@ -19,7 +20,8 @@ port=int(sys.argv[2])
 
 monitor = Monitor([
     ADXL345(),
-    ], 1000)
+    SinCos(),
+    ], capacity=1000, interval_sec=0.02)
 
 app = Flask(__name__, static_folder='.', static_url_path='')
 @app.route('/')
