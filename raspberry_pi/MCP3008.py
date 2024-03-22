@@ -8,20 +8,19 @@ class MCP3008(SensorInterface):
         self._max_speed_hz = max_speed_hz
         self._mode = mode
         self._mask = mask
-        
+
         spi = spidev.SpiDev()
         spi.close()
         spi.open(0,0)
         spi.max_speed_hz = self._max_speed_hz
         spi.mode = self._mode
-        
+
         self._spi = spi
 
     def analog_read(self, channel):
         r = self._spi.xfer2([1, (8 + channel) << 4, 0])
         adc_out = ((r[1]&3) << 8) + r[2]
         return adc_out
-        
 
     def get_sensor_name(self):
         return 'MCP3008'
@@ -31,7 +30,7 @@ class MCP3008(SensorInterface):
         return attrib
 
     def get_sensor_values(self):
-        reading = {f'ch{d}':self.analog_read(d) for d in range(0, 8) if (1 << d) & self._mask != 0}
+        reading = {f'ch{d}':self.analog_read(d) / 1023.0 for d in range(0, 8) if (1 << d) & self._mask != 0}
         return reading
 
 if __name__ == "__main__":
