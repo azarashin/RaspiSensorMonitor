@@ -26,11 +26,16 @@ class MCP3008(SensorInterface):
         return 'MCP3008'
 
     def get_sensor_attributes(self):
-        attrib = {"max_speed_hz": self._max_speed_hz, "mode": self._mode}
+        attrib = [
+            {'name': 'max_speed_hz', 'value': self._max_speed_hz},
+            {'name': 'mode', 'value': self._mode},
+        ]
         return attrib
 
     def get_sensor_values(self):
-        reading = {f'ch{d}':self.analog_read(d) / 1023.0 for d in range(0, 8) if (1 << d) & self._mask != 0}
+        reading = [
+            {'attribute': f'ch{d}', 'value': self.analog_read(d) / 1023.0}
+        for d in range(0, 8) if (1 << d) & self._mask != 0]
         return reading
 
 if __name__ == "__main__":

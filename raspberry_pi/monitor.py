@@ -26,7 +26,9 @@ class Monitor:
     time.sleep(1.0 + self._interval_sec)
 
   def get_attributes(self):
-    attribs={d.get_sensor_name(): d.get_sensor_attributes() for d in self._sensors}
+    attribs=[
+        {'device': d.get_sensor_name(), 'attributes': d.get_sensor_attributes()}
+        for d in self._sensors]
     return json.dumps(attribs)
 
   def get_device_list(self):
@@ -34,9 +36,10 @@ class Monitor:
     return json.dumps({'device_list': devices})
 
   def get_log(self, timestamp):
-    logs={d.get_sensor_name(): 
-        [d0 for d0 in self._log[d] if d0['ts'] > timestamp] for d in self._sensors
-    }
+    logs=[{
+        'device': d.get_sensor_name(),
+        'records': [d0 for d0 in self._log[d] if d0['ts'] > timestamp]
+        } for d in self._sensors]
     data = {'last_timestamp': self._last_ts, 'logs': logs}
 
     return json.dumps(data)

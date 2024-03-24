@@ -11,10 +11,13 @@ class SinCos(SensorInterface):
         return 'SinCos'
 
     def get_sensor_attributes(self):
-        attrib = {}
+        attrib = []
         return attrib
 
     def get_sensor_values(self):
         t = time() * self._freq
-        return {"sin": math.sin(t), "cos": math.cos(t)}
+        return [
+            {"attribute": "sin", "value":  math.sin(t)}, 
+            {"attribute": "cos", "value":  math.cos(t)}
+        ]
 

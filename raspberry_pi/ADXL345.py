@@ -59,7 +59,9 @@ class ADXL345(SensorInterface):
         return 'ADXL345'
 
     def get_sensor_attributes(self):
-        attrib = {"gForce": self._gForce}
+        attrib = [
+            {'name': 'gForce', 'value': self._gForce}
+        ]
         return attrib
 
     # returns the current reading from the sensor for each axis
@@ -95,7 +97,11 @@ class ADXL345(SensorInterface):
         y = round(y, 4)
         z = round(z, 4)
 
-        return {"x": x, "y": y, "z": z}
+        return [
+            {'attribute': 'x', 'value': x},
+            {'attribute': 'y', 'value': y},
+            {'attribute': 'z', 'value': z},
+        ]
 
 if __name__ == "__main__":
     # if run directly we'll just create an instance of the class and output

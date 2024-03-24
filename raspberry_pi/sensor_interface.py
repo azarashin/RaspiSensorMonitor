@@ -11,11 +11,18 @@ class SensorInterface(object, metaclass=ABCMeta):
 
     @abstractmethod
     def get_sensor_values(self):
-       values = {'valueA': 10, 'valueB': 20}
-       return values
+        values = [
+            {'attribute': 'valueA', 'value': 10},
+            {'attribute': 'valueB', 'value': 20},
+        ]
+        return values
 
     @abstractmethod
     def get_sensor_attributes(self):
-       attributes = {'attributeA': 'abc', 'attributeB': 'xyz'}
-       return attributes
+        attributes = [
+            {'name': 'attributeA', 'value': 'abc' },
+            {'name': 'attributeB', 'value': 'xyz' }
+        ]
+
+        return attributes
 
