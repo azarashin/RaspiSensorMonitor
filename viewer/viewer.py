@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-
+import sys
 import requests
 import time
 import json
@@ -60,8 +60,8 @@ class Graph:
 #            plot.remove()
     
 class Viewer:
-    def __init__(self, buffer_duration = 15.0, view_duration = 5.0, delay = 1.0):
-        self._endpoint = 'http://192.168.0.21:8000/'
+    def __init__(self, ipHost, port, buffer_duration = 15.0, view_duration = 5.0, delay = 1.0):
+        self._endpoint = f'http://{ipHost}:{port}/'
         res = requests.get(f'{self._endpoint}/current_timestamp')
         ts = json.loads(res.text)
         self._last_timestamp = ts['current_timestamp']
@@ -99,31 +99,37 @@ class Viewer:
             self._log[device] = [d for d in self._log[device] if d[0] > head]
         self._last_timestamp = last_timestamp
 
-mplstyle.use('fast')
+if __name__ == '__main__':
+    if len(sys.argv) != 3:
+        print('usage: python .py ipHost port')
+        exit()
+    ipHost = sys.argv[1]
+    port = sys.argv[2]
+    mplstyle.use('fast')
 
-v = Viewer(buffer_duration = 15.0, view_duration = 5.0, delay=3.0)        
-v.reload()
-running = True
+    v = Viewer(ipHost, port, buffer_duration = 15.0, view_duration = 5.0, delay=3.0)        
+    v.reload()
+    running = True
 
-def thread_network():
-    while running:
-        # Burst transmission
-        v.reload()
-        time.sleep(2)
+    def thread_network():
+        while running:
+            # Burst transmission
+            v.reload()
+            time.sleep(2)
 
 
-thread_network_task = threading.Thread(target=thread_network, name='network', daemon=True)
-thread_network_task.start()
+    thread_network_task = threading.Thread(target=thread_network, name='network', daemon=True)
+    thread_network_task.start()
 
-while running:
-    time.sleep(0.05)
-    v.draw()
-
-try:
     while running:
         time.sleep(0.05)
         v.draw()
-except:
-    running = False
 
-thread_network_task.join()
+    try:
+        while running:
+            time.sleep(0.05)
+            v.draw()
+    except:
+        running = False
+
+    thread_network_task.join()
