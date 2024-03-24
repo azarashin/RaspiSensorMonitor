@@ -7,9 +7,9 @@ import json
 import threading
 import matplotlib.style as mplstyle
 class Graph:
-    def __init__(self, device, attribs, duration, delay):
-        self._xs = []
-        self._yss = {d:[] for d in attribs}
+    def __init__(self, duration, delay):
+#        self._xs = []
+#        self._yss = {d:[] for d in attribs}
         fig, ax = plt.subplots()
         self._fig = fig
         self._ax = ax
@@ -39,15 +39,17 @@ class Graph:
         for record in records:
             vals = record[1]
             for attrib in vals:
-                val = vals[attrib]
-                if not attrib in lines:
-                    lines[attrib] = []
-                lines[attrib].append(val)
+                attrib_name = attrib['attribute']
+                val = attrib['value']
+                if not attrib_name in lines:
+                    lines[attrib_name] = []
+                lines[attrib_name].append(val)
         #print(tss)
         #print(lines)
         plots = []
         for i, attrib in enumerate(vals): 
-            plot, = self._ax.plot(tss, lines[attrib], color=f'C{i}', linestyle='-')
+            attrib_name = attrib['attribute']
+            plot, = self._ax.plot(tss, lines[attrib_name], color=f'C{i}', linestyle='-')
             plots.append(plot)
 
         self._ax.set_xlabel('X label')
@@ -61,7 +63,6 @@ class Graph:
 class Viewer:
     def __init__(self, buffer_duration = 15.0, view_duration = 5.0, delay = 1.0):
         self._endpoint = 'http://192.168.0.21:8000/'
-        res = requests.get(f'{self._endpoint}/attributes')
         res = requests.get(f'{self._endpoint}/current_timestamp')
         ts = json.loads(res.text)
         self._last_timestamp = ts['current_timestamp']
@@ -69,10 +70,10 @@ class Viewer:
         self._delay = delay
         res = requests.get(f'{self._endpoint}/attributes')
         attributes = json.loads(res.text)
-        devices = attributes.keys()
+        devices = [d['device'] for d in attributes]
         self._log = {d:[] for d in devices}
         
-        self._graphs = {d: Graph(d, attributes[d], view_duration, delay) for d in attributes}
+        self._graphs = {d: Graph(view_duration, delay) for d in devices}
 
     def draw(self):
         for device in self._log:
@@ -87,15 +88,16 @@ class Viewer:
         logs = data['logs']
         head = float(last_timestamp) - self._duration - self._delay
         #print(f'last_timestamp: {last_timestamp}, head: {head}')
-        for device_name in logs:
-            #print(f'device: {device_name}')
-            records = logs[device_name]
+        for log in logs:
+            device = log['device']
+            records = log['records']
+            #print(f'device: {device}')
             for record in records:
                 ts = float(record['ts'])
                 vals = record['vals']
-                self._log[device_name].append((ts, vals))
+                self._log[device].append((ts, vals))
                 #print(f'ts: {ts}, vals: {vals}')
-            self._log[device_name] = [d for d in self._log[device_name] if d[0] > head]
+            self._log[device] = [d for d in self._log[device] if d[0] > head]
         self._last_timestamp = last_timestamp
 
 mplstyle.use('fast')
@@ -113,6 +115,10 @@ def thread_network():
 
 thread_network_task = threading.Thread(target=thread_network, name='network', daemon=True)
 thread_network_task.start()
+
+while running:
+    time.sleep(0.05)
+    v.draw()
 
 try:
     while running:
