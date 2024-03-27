@@ -21,7 +21,7 @@ port=int(sys.argv[2])
 
 monitor = Monitor([
     ADXL345(),
-    MCP3008(),
+    MCP3008(mask=0xff),
     SinCos(),
     ], capacity=1000, interval_sec=0.02)
 
